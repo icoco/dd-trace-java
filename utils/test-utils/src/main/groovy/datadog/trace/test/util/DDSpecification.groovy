@@ -40,6 +40,8 @@ abstract class DDSpecification extends Specification {
   // doesn't work because the properties object is not cloned for each invocation
   private static Properties originalSystemProperties
 
+  protected boolean assertThreadsEachCleanup = true
+
   static void makeConfigInstanceModifiable() {
     if (isConfigInstanceModifiable || configModificationFailed) {
       return
@@ -116,6 +118,8 @@ abstract class DDSpecification extends Specification {
     if (isConfigInstanceModifiable) {
       rebuildConfig()
     }
+
+    assert Thread.getAllStackTraces().keySet().findAll { it.name.startsWith("dd-") && it.name != "dd-task-scheduler" }.isEmpty()
   }
 
   void setup() {
@@ -137,6 +141,13 @@ abstract class DDSpecification extends Specification {
 
     if (isConfigInstanceModifiable) {
       rebuildConfig()
+    }
+
+    if (assertThreadsEachCleanup) {
+      assert Thread.getAllStackTraces()
+        .keySet()
+        .findAll { it.name.startsWith("dd-") && it.name != "dd-task-scheduler" }
+        .isEmpty(): "DD threads still active.  Forget to close() a tracer?"
     }
   }
 

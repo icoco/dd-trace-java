@@ -192,6 +192,7 @@ public abstract class AgentTestRunner extends DDSpecification {
 
   @Before
   public void beforeTest() {
+    assertThreadsEachCleanup = false;
     checkLoggingConfiguration();
     assert getTestTracer().activeSpan() == null
         : "Span is active before test has started: " + getTestTracer().activeSpan();
@@ -227,6 +228,7 @@ public abstract class AgentTestRunner extends DDSpecification {
   @AfterClass
   public void cleanUpAfterTests() {
     TEST_LISTENER.deactivateTest(this);
+    ((CoreTracer) TEST_TRACER).close();
   }
 
   /** Override to clean up things after the agent is removed */
