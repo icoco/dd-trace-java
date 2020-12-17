@@ -1,0 +1,21 @@
+plugins {
+  id "com.github.johnrengelman.shadow" version "5.2.0"
+}
+apply from: "$rootDir/gradle/java.gradle"
+description = 'OSGi Application Smoke Tests.'
+
+jar {
+  manifest {
+    attributes('Main-Class': 'datadog.smoketest.osgi.OSGiApplication')
+  }
+}
+
+dependencies {
+  testCompile project(':dd-smoke-tests')
+}
+
+tasks.withType(Test).configureEach {
+  dependsOn shadowJar
+
+  jvmArgs "-Ddatadog.smoketest.osgi.shadowJar.path=${tasks.shadowJar.archivePath}"
+}
