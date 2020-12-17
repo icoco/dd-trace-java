@@ -46,6 +46,11 @@ abstract class JettyServlet3Test extends AbstractServlet3Test<Server, ServletCon
   }
 
   @Override
+  String component() {
+    return "jetty-server"
+  }
+
+  @Override
   String getContext() {
     return "jetty-context"
   }
