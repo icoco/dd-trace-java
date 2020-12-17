@@ -1,7 +1,6 @@
 package datadog.trace.instrumentation.datanucleus;
 
 import static datadog.trace.bootstrap.instrumentation.java.concurrent.ExcludeFilter.ExcludeType.JDBC_CONNECTION;
-import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
@@ -11,7 +10,9 @@ import datadog.trace.agent.tooling.ExcludeFilterProvider;
 import datadog.trace.agent.tooling.Instrumenter;
 import datadog.trace.bootstrap.instrumentation.java.concurrent.ExcludeFilter;
 import java.sql.Connection;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
@@ -41,7 +42,17 @@ public class JDOConnectionInstrumentation extends Instrumenter.Tracing
   @Override
   public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
     return singletonMap(
-        JDBC_CONNECTION, singleton("org.datanucleus.api.jdo.JDOConnectionJDBCImpl"));
+        JDBC_CONNECTION,
+        new HashSet<>(
+            Arrays.asList(
+                "org.datanucleus.api.jdo.JDOConnectionJDBCImpl",
+                "org.datanucleus.store.rdbms.datasource.dbcp.DelegatingConnection",
+                "org.datanucleus.store.rdbms.datasource.dbcp.PoolableConnection",
+                "org.datanucleus.store.rdbms.datasource.dbcp.PoolingConnection",
+                "org.datanucleus.store.rdbms.datasource.dbcp.cpdsadapter.ConnectionImpl",
+                "org.datanucleus.store.rdbms.datasource.dbcp.cpdsadapter.PooledConnectionImpl",
+                "org.datanucleus.store.rdbms.datasource.dbcp.managed.ManagedConnection",
+                "org.datanucleus.store.rdbms.datasource.dbcp.managed.PoolableManagedConnection")));
   }
 
   public static class UnwrapAdvice {
