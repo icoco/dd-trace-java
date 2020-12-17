@@ -19,7 +19,8 @@ public class ExcludeFilter {
     FUTURE,
     FORK_JOIN_TASK,
     RUNNABLE_FUTURE,
-    EXECUTOR;
+    EXECUTOR,
+    JDBC_CONNECTION;
 
     public static ExcludeType fromFieldType(String typeName) {
       switch (typeName) {
@@ -33,6 +34,8 @@ public class ExcludeFilter {
           return FORK_JOIN_TASK;
         case "java.util.concurrent.RunnableFuture":
           return RUNNABLE_FUTURE;
+        case "java.sql.Connection":
+          return JDBC_CONNECTION;
         default:
           return null;
       }
