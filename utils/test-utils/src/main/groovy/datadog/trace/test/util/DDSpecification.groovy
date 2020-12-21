@@ -6,6 +6,7 @@ import net.bytebuddy.dynamic.ClassFileLocator
 import net.bytebuddy.dynamic.Transformer
 import net.bytebuddy.utility.JavaModule
 import org.junit.Rule
+import spock.lang.Shared
 import spock.lang.Specification
 
 import java.lang.reflect.Constructor
@@ -41,6 +42,9 @@ abstract class DDSpecification extends Specification {
   private static Properties originalSystemProperties
 
   protected boolean assertThreadsEachCleanup = true
+
+  @Shared
+  private boolean ignoreThreads
 
   static void makeConfigInstanceModifiable() {
     if (isConfigInstanceModifiable || configModificationFailed) {
@@ -107,6 +111,11 @@ abstract class DDSpecification extends Specification {
     assert System.getProperties().findAll { it.key.toString().startsWith("dd.") }.isEmpty()
 
     saveProperties()
+
+    ignoreThreads = !Thread.getAllStackTraces().keySet().findAll { it.name.startsWith("dd-") && it.name != "dd-task-scheduler" }.isEmpty()
+    if (ignoreThreads) {
+      println("Class started with DD threads active.  Disabling check")
+    }
   }
 
   void cleanupSpec() {
@@ -119,7 +128,11 @@ abstract class DDSpecification extends Specification {
       rebuildConfig()
     }
 
-    assert Thread.getAllStackTraces().keySet().findAll { it.name.startsWith("dd-") && it.name != "dd-task-scheduler" }.isEmpty()
+    assert ignoreThreads || Thread.getAllStackTraces()
+      .keySet()
+      .findAll { it.name.startsWith("dd-") && it.name != "dd-task-scheduler" }
+      .isEmpty(): "DD threads still active.  Forget to close() a tracer?"
+
   }
 
   void setup() {
@@ -144,7 +157,7 @@ abstract class DDSpecification extends Specification {
     }
 
     if (assertThreadsEachCleanup) {
-      assert Thread.getAllStackTraces()
+      assert ignoreThreads || Thread.getAllStackTraces()
         .keySet()
         .findAll { it.name.startsWith("dd-") && it.name != "dd-task-scheduler" }
         .isEmpty(): "DD threads still active.  Forget to close() a tracer?"
