@@ -7,8 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class FieldBackedContextStores {
 
-  // provide fast lookup for a small number of stores
-  public static final int FAST_STORE_ID_LIMIT = 8;
+  // provide fast lookup for a fixed number of stores
+  public static final int FAST_STORE_ID_LIMIT = 32;
 
   public static final FieldBackedContextStore contextStore0 = new FieldBackedContextStore(0);
   public static final FieldBackedContextStore contextStore1 = new FieldBackedContextStore(1);
@@ -18,6 +18,30 @@ public final class FieldBackedContextStores {
   public static final FieldBackedContextStore contextStore5 = new FieldBackedContextStore(5);
   public static final FieldBackedContextStore contextStore6 = new FieldBackedContextStore(6);
   public static final FieldBackedContextStore contextStore7 = new FieldBackedContextStore(7);
+  public static final FieldBackedContextStore contextStore8 = new FieldBackedContextStore(8);
+  public static final FieldBackedContextStore contextStore9 = new FieldBackedContextStore(9);
+  public static final FieldBackedContextStore contextStore10 = new FieldBackedContextStore(10);
+  public static final FieldBackedContextStore contextStore11 = new FieldBackedContextStore(11);
+  public static final FieldBackedContextStore contextStore12 = new FieldBackedContextStore(12);
+  public static final FieldBackedContextStore contextStore13 = new FieldBackedContextStore(13);
+  public static final FieldBackedContextStore contextStore14 = new FieldBackedContextStore(14);
+  public static final FieldBackedContextStore contextStore15 = new FieldBackedContextStore(15);
+  public static final FieldBackedContextStore contextStore16 = new FieldBackedContextStore(16);
+  public static final FieldBackedContextStore contextStore17 = new FieldBackedContextStore(17);
+  public static final FieldBackedContextStore contextStore18 = new FieldBackedContextStore(18);
+  public static final FieldBackedContextStore contextStore19 = new FieldBackedContextStore(19);
+  public static final FieldBackedContextStore contextStore20 = new FieldBackedContextStore(20);
+  public static final FieldBackedContextStore contextStore21 = new FieldBackedContextStore(21);
+  public static final FieldBackedContextStore contextStore22 = new FieldBackedContextStore(22);
+  public static final FieldBackedContextStore contextStore23 = new FieldBackedContextStore(23);
+  public static final FieldBackedContextStore contextStore24 = new FieldBackedContextStore(24);
+  public static final FieldBackedContextStore contextStore25 = new FieldBackedContextStore(25);
+  public static final FieldBackedContextStore contextStore26 = new FieldBackedContextStore(26);
+  public static final FieldBackedContextStore contextStore27 = new FieldBackedContextStore(27);
+  public static final FieldBackedContextStore contextStore28 = new FieldBackedContextStore(28);
+  public static final FieldBackedContextStore contextStore29 = new FieldBackedContextStore(29);
+  public static final FieldBackedContextStore contextStore30 = new FieldBackedContextStore(30);
+  public static final FieldBackedContextStore contextStore31 = new FieldBackedContextStore(31);
 
   // fall-back to slightly slower lookup for any additional stores
   private static volatile FieldBackedContextStore[] extraStores = new FieldBackedContextStore[8];
@@ -40,6 +64,54 @@ public final class FieldBackedContextStores {
         return contextStore6;
       case 7:
         return contextStore7;
+      case 8:
+        return contextStore8;
+      case 9:
+        return contextStore9;
+      case 10:
+        return contextStore10;
+      case 11:
+        return contextStore11;
+      case 12:
+        return contextStore12;
+      case 13:
+        return contextStore13;
+      case 14:
+        return contextStore14;
+      case 15:
+        return contextStore15;
+      case 16:
+        return contextStore16;
+      case 17:
+        return contextStore17;
+      case 18:
+        return contextStore18;
+      case 19:
+        return contextStore19;
+      case 20:
+        return contextStore20;
+      case 21:
+        return contextStore21;
+      case 22:
+        return contextStore22;
+      case 23:
+        return contextStore23;
+      case 24:
+        return contextStore24;
+      case 25:
+        return contextStore25;
+      case 26:
+        return contextStore26;
+      case 27:
+        return contextStore27;
+      case 28:
+        return contextStore28;
+      case 29:
+        return contextStore29;
+      case 30:
+        return contextStore30;
+      case 31:
+        return contextStore31;
       default:
         return extraStores[storeId - FAST_STORE_ID_LIMIT];
     }
