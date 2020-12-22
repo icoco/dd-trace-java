@@ -208,7 +208,9 @@ final class ShouldInjectFieldsMatcher implements AgentBuilder.RawMatcher {
     }
     // if we didn't get there first then add this store to the existing set
     if (null != excludedStoreIdsForType) {
-      excludedStoreIdsForType.set(storeId);
+      synchronized (excludedStoreIdsForType) {
+        excludedStoreIdsForType.set(storeId);
+      }
     }
   }
 
@@ -230,7 +232,9 @@ final class ShouldInjectFieldsMatcher implements AgentBuilder.RawMatcher {
       String className = typeDefinition.asErasure().getTypeName();
       BitSet excludedStoreIdsForType = EXCLUDED_STORE_IDS_BY_TYPE.get(className);
       if (null != excludedStoreIdsForType) {
-        excludedStoreIds.or(excludedStoreIdsForType);
+        synchronized (excludedStoreIdsForType) {
+          excludedStoreIds.or(excludedStoreIdsForType);
+        }
       } else if (KEY_TYPE_IS_CLASS.containsKey(className)
           || impliesInjectedField(typeDefinition, visitedInterfaces)) {
         return true;
