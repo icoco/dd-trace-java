@@ -38,11 +38,11 @@ final class FieldBackedContextInjector implements AsmVisitorWrapper {
 
   static final String CONTEXT_STORE_ACCESS_PREFIX = "__datadogContext$";
 
-  static final String GETTER_METHOD = "get$" + CONTEXT_STORE_ACCESS_PREFIX;
+  static final String GETTER_METHOD = "$get$" + CONTEXT_STORE_ACCESS_PREFIX;
   static final String GETTER_METHOD_DESCRIPTOR =
       Type.getMethodDescriptor(Type.getType(Object.class), Type.INT_TYPE);
 
-  static final String PUTTER_METHOD = "put$" + CONTEXT_STORE_ACCESS_PREFIX;
+  static final String PUTTER_METHOD = "$put$" + CONTEXT_STORE_ACCESS_PREFIX;
   static final String PUTTER_METHOD_DESCRIPTOR =
       Type.getMethodDescriptor(Type.VOID_TYPE, Type.INT_TYPE, Type.getType(Object.class));
 

@@ -14,7 +14,7 @@ public final class FieldBackedContextStore implements ContextStore<Object, Objec
   @Override
   public Object get(final Object key) {
     if (key instanceof FieldBackedContextAccessor) {
-      return ((FieldBackedContextAccessor) key).get$__datadogContext$(storeId);
+      return ((FieldBackedContextAccessor) key).$get$__datadogContext$(storeId);
     } else {
       return weakStore().get(key);
     }
@@ -23,7 +23,7 @@ public final class FieldBackedContextStore implements ContextStore<Object, Objec
   @Override
   public void put(final Object key, final Object context) {
     if (key instanceof FieldBackedContextAccessor) {
-      ((FieldBackedContextAccessor) key).put$__datadogContext$(storeId, context);
+      ((FieldBackedContextAccessor) key).$put$__datadogContext$(storeId, context);
     } else {
       weakStore().put(key, context);
     }
@@ -33,13 +33,13 @@ public final class FieldBackedContextStore implements ContextStore<Object, Objec
   public Object putIfAbsent(final Object key, final Object context) {
     if (key instanceof FieldBackedContextAccessor) {
       final FieldBackedContextAccessor accessor = (FieldBackedContextAccessor) key;
-      Object existingContext = accessor.get$__datadogContext$(storeId);
+      Object existingContext = accessor.$get$__datadogContext$(storeId);
       if (null == existingContext) {
         synchronized (accessor) {
-          existingContext = accessor.get$__datadogContext$(storeId);
+          existingContext = accessor.$get$__datadogContext$(storeId);
           if (null == existingContext) {
             existingContext = context;
-            accessor.put$__datadogContext$(storeId, existingContext);
+            accessor.$put$__datadogContext$(storeId, existingContext);
           }
         }
       }
@@ -53,13 +53,13 @@ public final class FieldBackedContextStore implements ContextStore<Object, Objec
   public Object putIfAbsent(final Object key, final Factory<Object> contextFactory) {
     if (key instanceof FieldBackedContextAccessor) {
       final FieldBackedContextAccessor accessor = (FieldBackedContextAccessor) key;
-      Object existingContext = accessor.get$__datadogContext$(storeId);
+      Object existingContext = accessor.$get$__datadogContext$(storeId);
       if (null == existingContext) {
         synchronized (accessor) {
-          existingContext = accessor.get$__datadogContext$(storeId);
+          existingContext = accessor.$get$__datadogContext$(storeId);
           if (null == existingContext) {
             existingContext = contextFactory.create();
-            accessor.put$__datadogContext$(storeId, existingContext);
+            accessor.$put$__datadogContext$(storeId, existingContext);
           }
         }
       }
