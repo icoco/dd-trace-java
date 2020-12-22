@@ -11,11 +11,14 @@ import static net.bytebuddy.matcher.ElementMatchers.named;
 import com.google.auto.service.AutoService;
 import datadog.trace.agent.tooling.ExcludeFilterProvider;
 import datadog.trace.agent.tooling.Instrumenter;
+import datadog.trace.bootstrap.ContextStore;
 import datadog.trace.bootstrap.InstrumentationContext;
+import datadog.trace.bootstrap.instrumentation.api.AgentSpan;
 import datadog.trace.bootstrap.instrumentation.java.concurrent.AdviceUtils;
 import datadog.trace.bootstrap.instrumentation.java.concurrent.ExcludeFilter;
 import datadog.trace.bootstrap.instrumentation.java.concurrent.State;
 import datadog.trace.context.TraceScope;
+import datadog.trace.instrumentation.scala.PromiseHelper;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,6 +28,7 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import scala.concurrent.impl.Promise.Transformation;
+import scala.util.Try;
 
 @AutoService(Instrumenter.class)
 public final class PromiseTransformationInstrumentation extends Instrumenter.Tracing
@@ -41,7 +45,10 @@ public final class PromiseTransformationInstrumentation extends Instrumenter.Tra
 
   @Override
   public Map<String, String> contextStore() {
-    return singletonMap("scala.concurrent.impl.Promise$Transformation", State.class.getName());
+    Map<String, String> contextStore = new HashMap<>();
+    contextStore.put("scala.concurrent.impl.Promise$Transformation", State.class.getName());
+    contextStore.put("scala.util.Try", AgentSpan.class.getName());
+    return contextStore;
   }
 
   @Override
@@ -60,6 +67,11 @@ public final class PromiseTransformationInstrumentation extends Instrumenter.Tra
     // make sure nothing else instruments this
     return singletonMap(
         RUNNABLE, Collections.singleton("scala.concurrent.impl.Promise$Transformation"));
+  }
+
+  @Override
+  public String[] helperClassNames() {
+    return new String[] {"datadog.trace.instrumentation.scala.PromiseHelper"};
   }
 
   public static final class Construct {
@@ -114,25 +126,31 @@ public final class PromiseTransformationInstrumentation extends Instrumenter.Tra
 
   public static final class SubmitWithValue {
     @Advice.OnMethodEnter
-    public static <F, T> void beforeExecute(@Advice.This Transformation<F, T> task) {
+    public static <F, T> void beforeExecute(
+        @Advice.This Transformation<F, T> task, @Advice.Argument(value = 0) Try<T> resolved) {
       // about to enter an ExecutionContext so capture the scope if necessary
       // (this used to happen automatically when the RunnableInstrumentation
       // was relied on, and happens anyway if the ExecutionContext is backed
       // by a wrapping Executor (e.g. FJP, ScheduledThreadPoolExecutor)
-      State state = InstrumentationContext.get(Transformation.class, State.class).get(task);
+      ContextStore<Transformation, State> tStore =
+          InstrumentationContext.get(Transformation.class, State.class);
+      State state = tStore.get(task);
+      if (PromiseHelper.completionPriority) {
+        final AgentSpan span = InstrumentationContext.get(Try.class, AgentSpan.class).get(resolved);
+        State oState = state;
+        state = PromiseHelper.handleSpan(span, state);
+        if (state != oState) {
+          tStore.put(task, state);
+        }
+      }
       if (null == state) {
         final TraceScope scope = activeScope();
         if (scope != null) {
           state = State.FACTORY.create();
           state.captureAndSetContinuation(scope);
-          InstrumentationContext.get(Transformation.class, State.class).put(task, state);
+          tStore.put(task, state);
         }
       }
-    }
-
-    /** Promise.Transformation was introduced in scala 2.13 */
-    private static void muzzleCheck(final Transformation callback) {
-      callback.submitWithValue(null);
     }
   }
 }

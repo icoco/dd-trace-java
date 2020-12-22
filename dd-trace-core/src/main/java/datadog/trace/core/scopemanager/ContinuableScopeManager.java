@@ -85,6 +85,11 @@ public class ContinuableScopeManager implements AgentScopeManager {
     return activate(span, source, true, isAsyncPropagating);
   }
 
+  @Override
+  public TraceScope.Continuation captureSpan(final AgentSpan span, final ScopeSource source) {
+    return new SingleContinuation(this, span, source);
+  }
+
   private AgentScope activate(
       final AgentSpan span,
       final ScopeSource source,
