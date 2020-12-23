@@ -8,6 +8,8 @@ excludedClassesCoverage += [
   'datadog.trace.agent.test.base.*',
   'datadog.trace.agent.test.log.*',
   'datadog.trace.agent.test.AgentTestRunner.ErrorCountingListener',
+  // Unable to test waiting for startup without terrible mocking
+  'datadog.trace.agent.test.server.http.TestHttpServer',
   'datadog.trace.agent.test.utils.*',
   // Avoid applying jacoco instrumentation to classes instrumented by tested agent
   'context.ContextTestInstrumentation**',
